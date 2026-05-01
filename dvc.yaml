@@ -1,0 +1,8 @@
+stages:
+  process_raw_data:
+    cmd: python src/Features/feature_engineering.py
+    deps:
+      - src/Features/feature_engineering.py
+      - data_source/raw/manufacturing.csv
+    outs:
+      - data_source/Processed/processed_manufacturing.csv
