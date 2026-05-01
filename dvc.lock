@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  process_raw_data:
+    cmd: python src/Features/feature_engineering.py
+    deps:
+    - path: data_source/raw/manufacturing.csv
+      hash: md5
+      md5: 9acb012f67990af51d715885e43957bc
+      size: 1769561
+    - path: src/Features/feature_engineering.py
+      hash: md5
+      md5: 2f69c536133200410c58d6277ce69504
+      size: 5033
+    outs:
+    - path: data_source/Processed/processed_manufacturing.csv
+      hash: md5
+      md5: e52ba228e6548e7e788c3844b59b4148
+      size: 6580817
