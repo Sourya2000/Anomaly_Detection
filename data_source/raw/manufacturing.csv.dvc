@@ -1,0 +1,5 @@
+outs:
+- md5: 9acb012f67990af51d715885e43957bc
+  size: 1769561
+  hash: md5
+  path: manufacturing.csv
