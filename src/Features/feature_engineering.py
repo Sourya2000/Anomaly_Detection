@@ -110,6 +110,18 @@ print(f"\nZ-Score vs BREAKDOWN:\n{pd.crosstab(z_anomaly, df['BREAKDOWN'], rownam
 
 print(f"\nIQR vs BREAKDOWN:\n{pd.crosstab(iqr_anomaly, df['BREAKDOWN'], rownames=['IQR-flag'], colnames=['BREAKDOWN'])}")
 
+
+# Drop columns that are not needed in the final processed output, including all z-score and z-score flag columns
+zscore_cols = [col for col in df.columns if col.startswith('zscore_') or col.startswith('flag_z_') or col == 'total_z_flags']
+drop_cols = [
+    'Start_time_S1', 'Finish_time_S1', 'Start_time_S2', 'Finish_Time_S2',
+    'Start_time_S3', 'Finish_time_S3', 'Start_time_s4', 'Finish_time',
+    'ID', 'Overall_processing_time', 'Overall_waiting_time', 'Tardiness',
+    'Processing_Time_S1', 'Processing_Time_S2', 'Processing_Time_S3', 'Processing_Time_S4', 'Priority',
+    'BREAKS', 'BREAKDOWN', 'z'
+] + zscore_cols
+df.drop(columns=[col for col in drop_cols if col in df.columns], inplace=True)
+
 # Save processed DataFrame to data_source/Processed using a path relative to this script
 processed_path = os.path.abspath(os.path.join(script_dir, '../../data_source/Processed/processed_manufacturing.csv'))
 df.to_csv(processed_path, index=False)

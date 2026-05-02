@@ -1,0 +1,6 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = s3://your-bucket-name/path
+    endpointurl = http://garage:3900
+    region = garage

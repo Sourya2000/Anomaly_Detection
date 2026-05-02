@@ -1,0 +1,41 @@
+# DVC + S3 + Automation Setup
+
+1. Configure S3 remote for DVC:
+   dvc remote add -d myremote s3://<your-bucket-name>/<path>
+   dvc remote modify myremote endpointurl http://garage:3900
+   dvc remote modify myremote region garage
+   dvc remote modify myremote access_key_id <your-access-key>
+   dvc remote modify myremote secret_access_key <your-secret-key>
+
+2. Set environment variables (if needed):
+   S3_ENDPOINT=http://garage:3900
+   AWS_ENDPOINT_URL=http://garage:3900
+   AWS_ENDPOINT_URL_S3=http://garage:3900
+   AWS_REGION=garage
+   AWS_DEFAULT_REGION=garage
+
+3. DVC pipeline (dvc.yaml) automates:
+   - Processing raw data to processed folder using src/Features/feature_engineering.py
+   - Output: data_source/Processed/processed_manufacturing.csv
+
+4. To process and upload data:
+   dvc repro
+   dvc push
+
+5. If you get 'already tracked by SCM' error:
+   git rm -r --cached data_source/Processed/processed_manufacturing.csv
+   git commit -m "Stop tracking processed data, hand over to DVC"
+   dvc repro
+   dvc commit data_source/Processed/processed_manufacturing.csv
+   git add dvc.lock
+   git commit -m "Track processed data with DVC and update lock file"
+
+6. Push code and DVC metadata to Git:
+   git add dvc.yaml dvc.lock
+   git commit -m "Add DVC pipeline and lock file"
+   git push origin <branch>
+
+7. Push data to S3:
+   dvc push
+
+# Now, whenever you update raw data and run dvc repro, the processed data is updated and both are synced to S3.
