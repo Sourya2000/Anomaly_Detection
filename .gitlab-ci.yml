@@ -1,0 +1,83 @@
+stages:
+  - ingest
+  - validate
+  - prepare
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHON_VERSION: "3.11"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+  - pip install dvc
+
+# ============================================================================
+# INGEST STAGE: Upload raw dataset to Garage S3
+# ============================================================================
+ingest_data:
+  stage: ingest
+  image: python:${PYTHON_VERSION}
+  script:
+    - echo "Uploading manufacturing dataset to Garage S3..."
+    - python src/data/ingest_data.py
+  variables:
+    # These must be set in GitLab CI/CD Settings > Variables
+    # AWS_ACCESS_KEY_ID: (set in GitLab UI - masked variable)
+    # AWS_SECRET_ACCESS_KEY: (set in GitLab UI - masked variable)
+    AWS_ENDPOINT_URL_S3: "http://garage:3900"
+    AWS_DEFAULT_REGION: "garage"
+  only:
+    - main
+    - develop
+  artifacts:
+    paths:
+      - data_source/raw/
+    expire_in: 30 days
+
+# ============================================================================
+# VALIDATE STAGE: Validate raw data quality
+# ============================================================================
+validate_data:
+  stage: validate
+  image: python:${PYTHON_VERSION}
+  dependencies:
+    - ingest_data
+  script:
+    - echo "Validating raw manufacturing data..."
+    - python src/data/data_validation.py
+  artifacts:
+    paths:
+      - Logger/
+    reports:
+      junit: Logger/validation_summary.log
+    expire_in: 30 days
+  only:
+    - main
+    - develop
+
+# ============================================================================
+# PREPARE STAGE: Feature engineering with DVC
+# ============================================================================
+prepare_features:
+  stage: prepare
+  image: python:${PYTHON_VERSION}
+  dependencies:
+    - validate_data
+  script:
+    - echo "Running DVC pipeline for feature engineering..."
+    - dvc repro
+  artifacts:
+    paths:
+      - data_source/Processed/
+    expire_in: 30 days
+  only:
+    - main
+    - develop
