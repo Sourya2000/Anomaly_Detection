@@ -9,10 +9,65 @@ stages:
       size: 1769561
     - path: src/Features/feature_engineering.py
       hash: md5
-      md5: db992f9ed483cb78129926f772968cdf
-      size: 5737
+      md5: f0d1419dcea6785497f6696fb5a42bf4
+      size: 6137
     outs:
     - path: data_source/Processed/processed_manufacturing.csv
       hash: md5
-      md5: 42e165cdaf665009f49b4c79bab821e9
-      size: 2598158
+      md5: 25d2d0d084990cd310286e7b517c4ae6
+      size: 2133946
+  validate_processed_data:
+    cmd: python src/data/data_validation.py
+    deps:
+    - path: data_source/Processed/processed_manufacturing.csv
+      hash: md5
+      md5: 0bcd3783cbec51cd02d785d957e39167
+      size: 2158111
+    - path: src/data/data_validation.py
+      hash: md5
+      md5: b9c49d4d42734b366752a8dd343392ab
+      size: 11608
+    outs:
+    - path: Logger
+      hash: md5
+      md5: aaaa34cd98d8d54e4fcb908271d9e260.dir
+      size: 907385
+      nfiles: 3
+  validate_raw_data:
+    cmd: python src/data/data_validation.py
+    deps:
+    - path: data_source/raw/manufacturing.csv
+      hash: md5
+      md5: 9acb012f67990af51d715885e43957bc
+      size: 1769561
+    - path: src/data/data_validation.py
+      hash: md5
+      md5: a466c99978ea3533f9f8330982640af3
+      size: 8082
+    outs:
+    - path: Logger
+      hash: md5
+      md5: c879ed4b70eb67844270fa20438b9b72.dir
+      size: 329447
+      nfiles: 2
+  feature_engineering:
+    cmd: python src/Features/feature_engineering.py
+    deps:
+    - path: Logger
+      hash: md5
+      md5: c879ed4b70eb67844270fa20438b9b72.dir
+      size: 329447
+      nfiles: 2
+    - path: data_source/raw/manufacturing.csv
+      hash: md5
+      md5: 9acb012f67990af51d715885e43957bc
+      size: 1769561
+    - path: src/Features/feature_engineering.py
+      hash: md5
+      md5: f0d1419dcea6785497f6696fb5a42bf4
+      size: 6137
+    outs:
+    - path: data_source/Processed/processed_manufacturing.csv
+      hash: md5
+      md5: 25d2d0d084990cd310286e7b517c4ae6
+      size: 2133946

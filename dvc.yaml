@@ -1,8 +1,18 @@
 stages:
-  process_raw_data:
+  validate_raw_data:
+    cmd: python src/data/data_validation.py
+    deps:
+      - src/data/data_validation.py
+      - data_source/raw/manufacturing.csv
+    outs:
+      - Logger
+  
+  feature_engineering:
     cmd: python src/Features/feature_engineering.py
     deps:
       - src/Features/feature_engineering.py
       - data_source/raw/manufacturing.csv
+      - Logger
     outs:
       - data_source/Processed/processed_manufacturing.csv
+  
